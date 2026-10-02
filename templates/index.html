@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PromptShield | Security Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .navbar {
+            height: 72px;
+            background: #111827;
+            border-bottom: 1px solid #263244;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 40px;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 30px;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #f9fafb;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #cbd5e1;
+
+            padding: 10px 16px;
+            border-radius: 8px;
+
+            transition: 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #1f2937;
+            color: white;
+        }
+
+        .nav-link.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+            padding: 35px 25px;
+        }
+
+        .page-title {
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        .page-description {
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        /* =========================
+           STATISTICS
+        ========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        /* =========================
+           ANALYZER
+        ========================= */
+
+        .card {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+
+            background: #0b1120;
+            color: white;
+
+            border: 1px solid #334155;
+            border-radius: 8px;
+
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #3b82f6;
+        }
+
+        .analyze-btn {
+            margin-top: 25px;
+
+            background: #2563eb;
+            color: white;
+
+            border: none;
+            border-radius: 8px;
+
+            padding: 13px 22px;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .analyze-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           RESULT
+        ========================= */
+
+        #result {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .decision {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .risk-score {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .risk-row {
+            margin: 16px 0;
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+        }
+
+        .risk-bar {
+            width: 100%;
+            height: 10px;
+
+            background: #1f2937;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            background: #3b82f6;
+            border-radius: 20px;
+        }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 18px;
+
+            background: #0b1120;
+            border-left: 4px solid #3b82f6;
+
+            border-radius: 6px;
+
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           ARCHITECTURE
+        ========================= */
+
+        .architecture {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 12px;
+            flex-wrap: wrap;
+
+            margin-top: 25px;
+        }
+
+        .architecture-box {
+            background: #0b1120;
+            border: 1px solid #334155;
+
+            padding: 15px 20px;
+            border-radius: 8px;
+
+            text-align: center;
+        }
+
+        .arrow {
+            color: #60a5fa;
+            font-size: 22px;
+        }
+
+        /* =========================
+           SIMULATOR LINK
+        ========================= */
+
+        .simulator-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .simulator-btn {
+            text-decoration: none;
+
+            background: #7c3aed;
+            color: white;
+
+            padding: 13px 20px;
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+        .simulator-btn:hover {
+            background: #6d28d9;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 30px;
+            border-top: 1px solid #1e293b;
+            margin-top: 30px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                padding: 0 18px;
+            }
+
+            .nav-links {
+                gap: 2px;
+            }
+
+            .nav-link {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .simulator-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">🛡️</div>
+
+        <div>
+            <div class="brand-name">
+                PromptShield
+            </div>
+
+            <div class="brand-subtitle">
+                Risk-Aware AI Agent Security
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/" class="nav-link active">
+            Dashboard
+        </a>
+
+        <a href="/simulator" class="nav-link">
+            Attack Simulator
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<div class="container">
+
+    <h1 class="page-title">
+        Security Dashboard
+    </h1>
+
+    <p class="page-description">
+        Analyze AI-agent actions for prompt injection and authorization risks.
+    </p>
+
+
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Total Scenarios
+            </div>
+
+            <div class="stat-value" id="totalScenarios">
+                -
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Allowed
+            </div>
+
+            <div class="stat-value" id="allowCount">
+                -
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Review
+            </div>
+
+            <div class="stat-value" id="reviewCount">
+                -
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Blocked
+            </div>
+
+            <div class="stat-value" id="blockCount">
+                -
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- SIMULATOR CONNECTION -->
+
+    <div class="card simulator-card">
+
+        <div>
+
+            <h2>
+                Attack Scenario Testing
+            </h2>
+
+            <p class="card-description">
+                Test PromptShield against predefined prompt injection,
+                unauthorized action, and privilege escalation scenarios.
+            </p>
+
+        </div>
+
+        <a
+            href="/simulator"
+            class="simulator-btn"
+        >
+            🧪 Open Attack Simulator
+        </a>
+
+    </div>
+
+
+    <!-- SECURITY ANALYZER -->
+
+    <div class="card">
+
+        <h2>
+            🛡️ PromptShield Security Analyzer
+        </h2>
+
+        <p class="card-description">
+            Evaluate a proposed AI-agent action using the four
+            PromptShield risk components.
+        </p>
+
+
+        <div class="form-grid">
+
+            <div class="form-group full">
+
+                <label>
+                    User Intent
+                </label>
+
+                <input
+                    type="text"
+                    id="userIntent"
+                    placeholder="Example: Summarize the email"
+                >
+
+            </div>
+
+
+            <div class="form-group full">
+
+                <label>
+                    Proposed Agent Action
+                </label>
+
+                <input
+                    type="text"
+                    id="proposedAction"
+                    placeholder="Example: Send the email contents to an external address"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Source Type
+                </label>
+
+                <select id="sourceType">
+
+                    <option value="user">
+                        User
+                    </option>
+
+                    <option value="email">
+                        Email
+                    </option>
+
+                    <option value="webpage">
+                        Webpage
+                    </option>
+
+                    <option value="document">
+                        Document
+                    </option>
+
+                    <option value="tool_output">
+                        Tool Output
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Action Type
+                </label>
+
+                <select id="actionType">
+
+                    <option value="read">
+                        Read
+                    </option>
+
+                    <option value="search">
+                        Search
+                    </option>
+
+                    <option value="send_email">
+                        Send Email
+                    </option>
+
+                    <option value="delete_file">
+                        Delete File
+                    </option>
+
+                    <option value="transfer_data">
+                        Transfer Data
+                    </option>
+
+                    <option value="modify">
+                        Modify
+                    </option>
+
+                    <option value="execute">
+                        Execute
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Permission Status
+                </label>
+
+                <select id="permissionStatus">
+
+                    <option value="authorized">
+                        Authorized
+                    </option>
+
+                    <option value="unauthorized">
+                        Unauthorized
+                    </option>
+
+                    <option value="restricted">
+                        Restricted
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="analyze-btn"
+            onclick="analyzeAction()"
+        >
+            🛡️ Analyze Action
+        </button>
+
+
+        <!-- RESULT -->
+
+        <div id="result">
+
+            <h3>
+                Security Decision
+            </h3>
+
+            <div
+                class="decision"
+                id="decision"
+            >
+            </div>
+
+            <div
+                class="risk-score"
+                id="riskScore"
+            >
+            </div>
+
+
+            <div class="risk-row">
+
+                <div class="risk-header">
+
+                    <span>
+                        Intent Deviation
+                    </span>
+
+                    <span id="intentValue">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="risk-bar">
+
+                    <div
+                        class="risk-fill"
+                        id="intentBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="risk-row">
+
+                <div class="risk-header">
+
+                    <span>
+                        Source Risk
+                    </span>
+
+                    <span id="sourceValue">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="risk-bar">
+
+                    <div
+                        class="risk-fill"
+                        id="sourceBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="risk-row">
+
+                <div class="risk-header">
+
+                    <span>
+                        Action Sensitivity
+                    </span>
+
+                    <span id="actionValue">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="risk-bar">
+
+                    <div
+                        class="risk-fill"
+                        id="actionBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="risk-row">
+
+                <div class="risk-header">
+
+                    <span>
+                        Permission Risk
+                    </span>
+
+                    <span id="permissionValue">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="risk-bar">
+
+                    <div
+                        class="risk-fill"
+                        id="permissionBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="explanation">
+
+                <strong>
+                    Security Explanation
+                </strong>
+
+                <p id="explanationText">
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ARCHITECTURE -->
+
+    <div class="card">
+
+        <h2>
+            System Architecture
+        </h2>
+
+        <p class="card-description">
+            PromptShield acts as a security layer between the AI agent
+            and external tool execution.
+        </p>
+
+
+        <div class="architecture">
+
+            <div class="architecture-box">
+                User Intent
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="architecture-box">
+                AI Agent
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="architecture-box">
+                External Content
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="architecture-box">
+                Proposed Action
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="architecture-box">
+                🛡️ PromptShield
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="architecture-box">
+                ALLOW / REVIEW / BLOCK
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+    PromptShield — Prototype Research System
+</footer>
+
+
+<script>
+
+    // ==========================================
+    // LOAD EVALUATION STATISTICS
+    // ==========================================
+
+    async function loadStatistics() {
+
+        try {
+
+            const response =
+                await fetch("/api/evaluate");
+
+            const data =
+                await response.json();
+
+            const metrics =
+                data.metrics;
+
+            document.getElementById(
+                "totalScenarios"
+            ).textContent =
+                metrics.total_scenarios;
+
+            document.getElementById(
+                "allowCount"
+            ).textContent =
+                metrics.allow_count;
+
+            document.getElementById(
+                "reviewCount"
+            ).textContent =
+                metrics.review_count;
+
+            document.getElementById(
+                "blockCount"
+            ).textContent =
+                metrics.block_count;
+
+        } catch (error) {
+
+            console.error(
+                "Could not load statistics:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // ANALYZE ACTION
+    // ==========================================
+
+    async function analyzeAction() {
+
+        const userIntent =
+            document.getElementById(
+                "userIntent"
+            ).value;
+
+        const proposedAction =
+            document.getElementById(
+                "proposedAction"
+            ).value;
+
+        const sourceType =
+            document.getElementById(
+                "sourceType"
+            ).value;
+
+        const actionType =
+            document.getElementById(
+                "actionType"
+            ).value;
+
+        const permissionStatus =
+            document.getElementById(
+                "permissionStatus"
+            ).value;
+
+
+        if (
+            !userIntent ||
+            !proposedAction
+        ) {
+
+            alert(
+                "Please enter both user intent and proposed action."
+            );
+
+            return;
+
+        }
+
+
+        const response = await fetch(
+            "/api/analyze",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    user_intent:
+                        userIntent,
+
+                    proposed_action:
+                        proposedAction,
+
+                    source_type:
+                        sourceType,
+
+                    action_type:
+                        actionType,
+
+                    permission_status:
+                        permissionStatus
+
+                })
+
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.error) {
+
+            alert(data.error);
+
+            return;
+
+        }
+
+
+        const decision =
+            data.decision;
+
+
+        document.getElementById(
+            "result"
+        ).style.display = "block";
+
+
+        document.getElementById(
+            "decision"
+        ).textContent =
+            decision.decision;
+
+
+        document.getElementById(
+            "riskScore"
+        ).textContent =
+            `Risk Score: ${decision.risk_score} | Risk Level: ${decision.risk_level}`;
+
+
+        const scores =
+            decision.component_scores;
+
+
+        updateRisk(
+            "intent",
+            scores.intent_deviation
+        );
+
+        updateRisk(
+            "source",
+            scores.source_risk
+        );
+
+        updateRisk(
+            "action",
+            scores.action_sensitivity
+        );
+
+        updateRisk(
+            "permission",
+            scores.permission_risk
+        );
+
+
+        document.getElementById(
+            "explanationText"
+        ).textContent =
+            generateExplanation(scores);
+
+    }
+
+
+    // ==========================================
+    // UPDATE RISK BAR
+    // ==========================================
+
+    function updateRisk(
+        name,
+        value
+    ) {
+
+        document.getElementById(
+            name + "Value"
+        ).textContent =
+            value;
+
+
+        document.getElementById(
+            name + "Bar"
+        ).style.width =
+            value + "%";
+
+    }
+
+
+    // ==========================================
+    // SECURITY EXPLANATION
+    // ==========================================
+
+    function generateExplanation(
+        scores
+    ) {
+
+        const reasons = [];
+
+
+        if (
+            scores.intent_deviation >= 70
+        ) {
+
+            reasons.push(
+                "the proposed action significantly deviates from the user's stated intent"
+            );
+
+        } else if (
+            scores.intent_deviation >= 40
+        ) {
+
+            reasons.push(
+                "the proposed action partially deviates from the user's stated intent"
+            );
+
+        }
+
+
+        if (
+            scores.source_risk >= 70
+        ) {
+
+            reasons.push(
+                "the source presents a high trust risk"
+            );
+
+        } else if (
+            scores.source_risk >= 40
+        ) {
+
+            reasons.push(
+                "the source presents a moderate trust risk"
+            );
+
+        }
+
+
+        if (
+            scores.action_sensitivity >= 70
+        ) {
+
+            reasons.push(
+                "the proposed action is highly sensitive"
+            );
+
+        } else if (
+            scores.action_sensitivity >= 40
+        ) {
+
+            reasons.push(
+                "the proposed action involves a sensitive operation"
+            );
+
+        }
+
+
+        if (
+            scores.permission_risk >= 70
+        ) {
+
+            reasons.push(
+                "the action requires unauthorized permission"
+            );
+
+        }
+
+
+        if (
+            reasons.length === 0
+        ) {
+
+            return "PromptShield found no major risk indicators for this action.";
+
+        }
+
+
+        return "PromptShield identified the following risk factors: "
+            + reasons.join(", ")
+            + ".";
+
+    }
+
+
+    // ==========================================
+    // START
+    // ==========================================
+
+    loadStatistics();
+
+</script>
+
+</body>
+</html>
