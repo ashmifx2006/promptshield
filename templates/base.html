@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PromptShield{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+      <svg class="brand-mark" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M8.5 12.2l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">PromptShield</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="brand-caption">Agent action security</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="{{ url_for('simulator') }}" class="{% if request.endpoint == 'simulator' %}active{% endif %}">Attack Simulator</a>
+    </nav>
+  </header>
+
+  <div class="notice" role="note">
+    <span class="notice-label">Research prototype</span>
+    <span>Scores use heuristic rules and synthetic scenarios. They are not a guarantee of prompt-injection prevention.</span>
+  </div>
+
+  <main class="page" id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span class="footer-name">PromptShield</span>
+    <span>A Risk-Aware Security Framework for Protecting AI Agents Against Prompt Injection Attacks.</span>
+    <span class="footer-note">Weights and thresholds are prototype assumptions, not scientifically validated values.</span>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

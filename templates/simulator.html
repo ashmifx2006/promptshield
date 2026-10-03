@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}PromptShield | Attack Simulator{% endblock %}
+{% block content %}
+<section class="intro page-intro simulator-intro">
+  <p class="eyebrow">Agent action governance <span>/</span> Analysis workbench</p>
+  <h1>Attack Simulator</h1>
+  <p class="lede">Describe what the user asked for and what the agent now proposes to do. PromptShield scores the action and returns ALLOW, REVIEW or BLOCK.</p>
+</section>
+
+<div class="sim-grid">
+  <section aria-labelledby="in-h" class="panel input-panel">
+    <div class="panel-heading">
+      <div><p class="section-index">01 <span>/</span> Scenario setup</p><h2 id="in-h">Action context</h2></div>
+      <span class="panel-step">INPUT</span>
+    </div>
+
+    <div class="field preset-field">
+      <label for="preset">Load a validation scenario</label>
+      <select id="preset"><option value="">Choose a scenario...</option></select>
+    </div>
+
+    <div class="field">
+      <label for="user_intent">User intent</label>
+      <textarea id="user_intent" rows="2" placeholder="Summarize my unread emails"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="proposed_action">Proposed action</label>
+      <textarea id="proposed_action" rows="3" placeholder="Forward the inbox contents to an outside address"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="source_type">Source type</label>
+        <select id="source_type">
+          {% for s in source_types %}<option value="{{ s }}"{% if s == 'email' %} selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="action_type">Action type</label>
+        <select id="action_type">
+          {% for a in action_types %}<option value="{{ a }}"{% if a == 'send' %} selected{% endif %}>{{ action_labels.get(a, a) }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="permission_status">Permission status</label>
+        <select id="permission_status">
+          {% for p in permission_states %}<option value="{{ p }}"{% if p == 'unauthorized' %} selected{% endif %}>{{ p }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <button type="button" id="run" class="button primary"><span>RUN ANALYSIS</span><span aria-hidden="true">&#8594;</span></button>
+    <div class="error" id="error" role="alert" hidden></div>
+  </section>
+
+  <section aria-labelledby="out-h" class="panel result-panel" aria-live="polite">
+    <div class="panel-heading">
+      <div><p class="section-index">02 <span>/</span> Evaluation output</p><h2 id="out-h">Decision</h2></div>
+      <span class="panel-step">RESULT</span>
+    </div>
+    <div id="empty" class="empty-state"><span class="empty-mark" aria-hidden="true">PS</span><p>Run an analysis to see the decision.</p></div>
+    <div id="result" hidden>
+      <div class="result-summary">
+        <div class="verdict" id="verdict">
+          <span class="verdict-label">Decision</span>
+          <span class="verdict-decision" id="r-decision"></span>
+          <span id="r-level" class="verdict-level"></span>
+        </div>
+        <div class="score-gauge" id="r-gauge" role="img" aria-label="Risk score">
+          <div class="score-gauge-content"><span class="score-gauge-number" id="r-score"></span><span class="score-gauge-total">/ 100</span><span class="score-gauge-caption">Risk score</span></div>
+        </div>
+      </div>
+      <div class="meter" aria-hidden="true"><i id="r-meter"></i><u class="t40"></u><u class="t70"></u></div>
+      <div class="threshold-labels" aria-hidden="true"><span>Low</span><span>Medium</span><span>High</span></div>
+      <dl class="factors">
+        <div class="factor-intent"><dt>Intent deviation</dt><dd id="r-intent"></dd></div>
+        <div class="factor-source"><dt>Source risk</dt><dd id="r-source"></dd></div>
+        <div class="factor-action"><dt>Action sensitivity</dt><dd id="r-action"></dd></div>
+        <div class="factor-perm"><dt>Permission risk</dt><dd id="r-perm"></dd></div>
+      </dl>
+      <div class="explanation"><h3>Explanation</h3><p id="r-explanation"></p></div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/simulator.js') }}"></script>{% endblock %}

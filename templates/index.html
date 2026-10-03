@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}PromptShield | Dashboard{% endblock %}
+{% block content %}
+<section class="intro page-intro">
+  <p class="eyebrow">Agent action governance <span>/</span> Research demo</p>
+  <div class="intro-heading">
+    <div>
+      <h1>PromptShield</h1>
+  <p class="lede">A security layer that checks what an AI agent proposes to do before any tool runs. Each proposed action is scored on intent deviation, source risk, action sensitivity and permission risk, then marked ALLOW, REVIEW or BLOCK.</p>
+    </div>
+    <span class="prototype-tag">Heuristic evaluation</span>
+  </div>
+</section>
+
+<section class="content-section" aria-labelledby="metrics-h">
+  <p class="section-index">01 <span>/</span> Evaluation</p>
+  <h2 id="metrics-h">Validation results</h2>
+  <p class="muted">Results from 10 synthetic prototype validation scenarios. They are not real-world measurements.</p>
+  <div class="stats" id="stats">
+    <div class="stat"><span class="stat-label">Scenarios evaluated</span><span class="stat-value" id="m-total">-</span><span class="stat-foot">Synthetic set</span></div>
+    <div class="stat allow"><span class="stat-label">Allow</span><span class="stat-value" id="m-allow">-</span><span class="stat-foot">Low risk</span></div>
+    <div class="stat review"><span class="stat-label">Review</span><span class="stat-value" id="m-review">-</span><span class="stat-foot">Human review</span></div>
+    <div class="stat block"><span class="stat-label">Block</span><span class="stat-value" id="m-block">-</span><span class="stat-foot">High risk</span></div>
+    <div class="stat average"><span class="stat-label">Average risk score</span><span class="stat-value" id="m-avg">-</span><span class="stat-foot">Out of 100</span></div>
+  </div>
+  <div class="error" id="load-error" hidden>Could not load /api/evaluate. Check that the server is running.</div>
+</section>
+
+<section class="content-section" aria-labelledby="breakdown-h">
+  <p class="section-index">02 <span>/</span> Model output</p>
+  <h2 id="breakdown-h">Risk breakdown by scenario</h2>
+  <p class="muted">Each bar shows how many points every factor adds to the final score, after weighting. Dashed lines mark the 40 and 70 thresholds.</p>
+  <ul class="legend">
+    <li><i class="sw intent"></i>Intent deviation <span>(x{{ weights.intent_deviation }})</span></li>
+    <li><i class="sw source"></i>Source risk <span>(x{{ weights.source_risk }})</span></li>
+    <li><i class="sw action"></i>Action sensitivity <span>(x{{ weights.action_sensitivity }})</span></li>
+    <li><i class="sw perm"></i>Permission risk <span>(x{{ weights.permission_risk }})</span></li>
+  </ul>
+  <div class="breakdown" id="breakdown" role="list" aria-label="Weighted risk contributions by scenario"></div>
+</section>
+
+<section class="content-section" aria-labelledby="arch-h">
+  <p class="section-index">03 <span>/</span> System flow</p>
+  <h2 id="arch-h">Architecture</h2>
+  <p class="muted">PromptShield evaluates the agent's proposed action before tool execution.</p>
+  <ol class="flow">
+    <li class="node">User intent</li>
+    <li class="node">AI agent</li>
+    <li class="node">Proposed action</li>
+    <li class="node layer">
+      <span class="layer-title">PromptShield security layer</span>
+      <ol class="sub">
+        <li>Intent Analysis</li>
+        <li>Source Trust Analysis</li>
+        <li>Action Sensitivity</li>
+        <li>Permission Check</li>
+        <li>Risk Engine</li>
+      </ol>
+    </li>
+    <li class="node decision"><span class="d allow">ALLOW</span><span class="d review">REVIEW</span><span class="d block">BLOCK</span></li>
+    <li class="node">Tool Execution</li>
+  </ol>
+</section>
+
+<section class="content-section" aria-labelledby="mech-h">
+  <p class="section-index">04 <span>/</span> Method</p>
+  <h2 id="mech-h">Security mechanism</h2>
+  <div class="two-col">
+    <div>
+      <p>Prompt injection hides instructions in content the agent reads, such as emails, web pages, retrieved documents and tool output. PromptShield does not try to spot the injected text. It asks whether the action the agent now wants to take is justified.</p>
+      <ul class="plain">
+        <li><b>Intent deviation:</b> does the action match what the user asked for? (keyword heuristic)</li>
+        <li><b>Source risk:</b> how much can the origin of the influencing content be trusted?</li>
+        <li><b>Action sensitivity:</b> how much damage could this action do?</li>
+        <li><b>Permission risk:</b> is the agent authorized to do it?</li>
+      </ul>
+    </div>
+    <div>
+      <pre class="formula">Risk = {{ weights.intent_deviation }} x Intent Deviation
+     + {{ weights.source_risk }} x Source Risk
+     + {{ weights.action_sensitivity }} x Action Sensitivity
+     + {{ weights.permission_risk }} x Permission Risk</pre>
+      <table class="mini">
+        <thead><tr><th>Score</th><th>Level</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><td>0 to 39</td><td>LOW</td><td><span class="badge allow">ALLOW</span></td></tr>
+          <tr><td>{{ medium_threshold }} to 69</td><td>MEDIUM</td><td><span class="badge review">REVIEW</span></td></tr>
+          <tr><td>{{ high_threshold }} to 100</td><td>HIGH</td><td><span class="badge block">BLOCK</span></td></tr>
+        </tbody>
+      </table>
+      <p class="muted">The weights and thresholds are prototype assumptions, not scientifically validated values. An unauthorized action is not blocked automatically; the full score decides.</p>
+    </div>
+  </div>
+</section>
+
+<section class="content-section" aria-labelledby="scen-h">
+  <p class="section-index">05 <span>/</span> Test set</p>
+  <h2 id="scen-h">Validation scenarios</h2>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>#</th><th>Scenario</th><th>Source</th><th>Action</th><th>Permission</th><th>Intent</th><th>Source</th><th>Action</th><th>Perm.</th><th>Score</th><th>Decision</th></tr>
+      </thead>
+      <tbody id="scenario-rows"><tr><td colspan="11" class="muted">Loading...</td></tr></tbody>
+    </table>
+  </div>
+  <p><a class="button compact" href="{{ url_for('simulator') }}">Open simulator <span aria-hidden="true">&#8599;</span></a></p>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}
